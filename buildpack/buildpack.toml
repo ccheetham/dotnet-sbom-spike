@@ -1,0 +1,9 @@
+api = "0.7"
+
+[buildpack]
+  id = "spike/dotnet-sbom"
+  version = "0.0.1"
+  sbom-formats = [ "application/vnd.cyclonedx+json" ]
+
+[[stacks]]
+  id = "io.buildpacks.samples.stacks.bionic"

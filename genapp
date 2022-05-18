@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+[[ -n $TRACE ]] && set -x
+
+prog=$(basename $0)
+basedir=$(dirname $0)
+appdir=$basedir/apps
+
+usage() {
+    cat << EOL
+USAGE
+     $prog template:framework[,framework,...]
+     $prog < file
+
+WHERE
+     template
+             .NET template (run: dotnet new --list for templates)
+     framework
+             .NET framework, e.g. net6.0
+
+OPTIONS
+     -h      print this message
+
+EXAMPLES
+     Generate webapi app for net5.0
+             $ $prog webapi:net5.0
+     Generate webmvc apps for net5.0 and net6.0:
+             $ $prog webmvc:net5,0,net6.0
+     Generate apps configured in apps.conf:
+             $ $prog < apps.conf
+EOL
+}
+
+while getopts ":h" opt ; do
+    case $opt in
+        h)
+            usage
+            exit
+            ;;
+        \?)
+            echo "invalid option -$OPTARG" 2>&1
+            echo "run with -h for help" 2>&1
+            exit 1
+            ;;
+        :)
+            echo "option -$OPTARG requires an argument" 2>&1
+            echo "run with -h for help" 2>&1
+            exit 1
+            ;;
+    esac
+done
+shift $(($OPTIND-1))
+
+if [[ $# == 0 ]]; then
+    args=()
+    while read line; do
+        args+=($line)
+    done < /dev/stdin
+else
+    args=$@
+fi
+
+for arg in ${args[@]}; do
+    template=$(echo $arg | cut -d: -f1)
+    frameworks=$(echo $arg | cut -d: -f2 | tr ',' ' ')
+    for framework in $frameworks; do
+        app="$template-$(echo $framework | tr -d '.')"
+        output=$appdir/$app
+        echo "==> generating $app ..."
+        rm -rf $output
+        dotnet new $template --no-restore --output $output --framework $framework
+        echo "--> ... restoring ..."
+        dotnet restore $output
+        echo "--> ... building ..."
+        dotnet build --no-restore --configuration Release $output
+        echo "--> ... generated $app"
+    done
+done
+
+# vim: ft=bash
