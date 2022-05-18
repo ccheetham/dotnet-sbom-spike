@@ -65,11 +65,12 @@ log "project name is $project_name"
 framework=$(grep '<TargetFramework>' "$project_file" | sed 's/<[^>]*>//g' | tr -d '[[:space:]]')
 log "framework is $framework"
 
-deps_file=bin/Release/$framework/webapi-net60.deps.json
+deps_file=bin/Release/$framework/$project_name.deps.json
 log "dependencies file is $deps_file"
 
 
 heading "Generating Project SBOM"
+
 project_layer="$layers_dir/$project_name"
 mkdir -p "$project_layer"
 cat > "$layers_dir/$project_name.toml" << EOL
