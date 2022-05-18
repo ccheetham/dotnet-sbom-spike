@@ -8,8 +8,8 @@ Instead, all app prepwork is expected to be done prior to packing.
 
 Status:
 
-    * NuGet SBOM: in progress
-    * Runtime/Framework SBOM: not started
+* NuGet SBOM: in progress
+* Runtime/Framework SBOM: not started
 
 ## Prep
 
