@@ -1,9 +1,14 @@
 # .NET SBOM Spike
 
-This spike creates a buildpack to generate NuGet and .NET runtime SBOMS.
+This spike creates a buildpack to generate NuGet and .NET runtime/framework SBOMS.
 
 The buildpack does not alter the application being packed, e.g. it does not run `dotnet build`.
 Instead, all app prepwork is expected to be done prior to packing.
+
+
+Status:
+    * NuGet SBOM: in progress
+    * Runtime/Framework SBOM: not started
 
 ## Prep
 
@@ -18,7 +23,7 @@ $ pack config trusted-builders add cnbs/sample-builder:bionic
 $ pack build IMAGE --path APPPATH --buildpack ./buildpack
 ```
 
-## Specifying Syft Version
+## Overriding Syft Version
 
 ```
 $ echo '0.46.1' > APPPATH/.syft-version
