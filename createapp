@@ -66,14 +66,14 @@ for arg in ${args[@]}; do
     for framework in $frameworks; do
         app="$template-$(echo $framework | tr -d '.')"
         output=$appdir/$app
-        echo "==> generating $app ..."
+        echo "==> creating $app ..."
         rm -rf $output
         dotnet new $template --no-restore --output $output --framework $framework
         echo "--> ... restoring ..."
         dotnet restore $output
         echo "--> ... building ..."
         dotnet build --no-restore --configuration Release $output
-        echo "--> ... generated $app"
+        echo "--> ... created $app"
     done
 done
 
