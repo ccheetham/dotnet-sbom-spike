@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 [[ -n $TRACE ]] && set -x
+set -eo pipefail
 
-prog=$(basename $0)
-basedir=$(dirname $0)
-appdir=$basedir/apps
+source $(dirname $0)/../etc/profile.sh
 
 usage() {
     cat << EOL
@@ -17,6 +16,7 @@ WHERE
              .NET template (run: dotnet new --list for templates)
      framework
              .NET framework, e.g. net6.0
+     file    app configuration file (see etc/apps.conf for example)
 
 OPTIONS
      -h      print this message
@@ -26,8 +26,8 @@ EXAMPLES
              $ $prog webapi:net5.0
      Generate webmvc apps for net5.0 and net6.0:
              $ $prog webmvc:net5,0,net6.0
-     Generate apps configured in apps.conf:
-             $ $prog < apps.conf
+     Generate apps configured in etc/apps.conf:
+             $ $prog < etc/apps.conf
 EOL
 }
 
@@ -38,14 +38,10 @@ while getopts ":h" opt ; do
             exit
             ;;
         \?)
-            echo "invalid option -$OPTARG" 2>&1
-            echo "run with -h for help" 2>&1
-            exit 1
+            die "invalid option -$OPTARG; run with -h for help"
             ;;
         :)
-            echo "option -$OPTARG requires an argument" 2>&1
-            echo "run with -h for help" 2>&1
-            exit 1
+            die "option -$OPTARG requires an argument; run with -h for help" 2>&1
             ;;
     esac
 done
@@ -66,14 +62,10 @@ for arg in ${args[@]}; do
     for framework in $frameworks; do
         app="$template-$(echo $framework | tr -d '.')"
         output=$appdir/$app
-        echo "==> creating $app ..."
+        msg "creating $app ..."
         rm -rf $output
         dotnet new $template --no-restore --output $output --framework $framework
-        echo "--> ... restoring ..."
-        dotnet restore $output
-        echo "--> ... building ..."
-        dotnet build --no-restore --configuration Release $output
-        echo "--> ... created $app"
+        msg "... created $app"
     done
 done
 

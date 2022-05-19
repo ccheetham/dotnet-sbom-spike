@@ -34,7 +34,7 @@ $ echo '0.46.1' > APPPATH/.syft-version
 
 Create sample apps:
 ```
-$ ./createapp < apps.conf
+$ bin/createapp.sh < etc/apps.conf
 ==> creating console-net50 ...
 The template "Console Application" was created successfully.
 --> ... restoring ...
