@@ -18,61 +18,22 @@ $ pack config default-builder cnbs/sample-builder:bionic
 $ pack config trusted-builders add cnbs/sample-builder:bionic
 ```
 
-## Basic Usage
+## Basic Usage Overview
 
+prepare sample apps:
 ```
-$ pack build IMAGE --path APPPATH --buildpack ./buildpack
-```
-
-## Overriding Syft Version
-
-```
-$ echo '0.46.1' > APPPATH/.syft-version
+$ bin/prepapp.sh -c etc/apps.conf
 ```
 
-## Running Buildpack on Sample Applications
-
-Create sample apps:
+pack a sample app:
 ```
-$ bin/createapp.sh < etc/apps.conf
-==> creating console-net50 ...
-The template "Console Application" was created successfully.
---> ... restoring ...
-  Determining projects to restore...
-...
---> ... building ...
-Microsoft (R) Build Engine version 17.0.0+c9eb9dd64 for .NET
-...
---> ... created console-net50
-...
-
-$ ls -1 apps/
-console-net50
-console-net60
-mvc-net50
-mvc-net60
-steeltoe-webapi-net50
-steeltoe-webapi-net60
-web-net50
-web-net60
-webapi-net50
-webapi-net60
+$ bin/packapp.sh -a webapi-net60
 ```
 
-Run buildpack using a sample app:
-```
-$ pack build webapi-net60 --path apps/webapi-net60 --buildpack ./buildpack
-```
+## Advanced Usage
 
-## Downloading SBOM
-
+run with -h for command help:
 ```
-$ pack sbom download webapi-net60
-$ tree layers
-layers
-└── sbom
-    └── launch
-        └── spike_dotnet-sbom
-            └── webapi-net60
-                └── sbom.cdx.json
+$ bin/prepapp.sh -h
+$ bin/packapp.sh -h
 ```
