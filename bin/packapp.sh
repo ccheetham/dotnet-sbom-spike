@@ -87,6 +87,19 @@ msg "running dotnet restore"
 run dotnet restore $apppath
 msg "running dotnet build"
 run dotnet build --no-restore --configuration Release $apppath
+msg "storing app deps"
+mkdir -p $apppath/deps
+cp $apppath/bin/Release/*/$app.deps.json $apppath/deps
+msg "storeing framework deps"
+dotnet_home=$(dirname $(command -v dotnet))
+rtconfig=$apppath/bin/Release/*/$app.runtimeconfig.json
+rtfs=$(jq '.runtimeOptions.frameworks[].name' < $rtconfig | tr -d '"')
+for rtf in $rtfs; do
+    rtfv=$(jq '.runtimeOptions.frameworks[] | select(.name=="'$rtf'") | .version' < $rtconfig | tr -d '"')
+    crumb "storing deps for $rtf $rtfv"
+    rtfdeps=$dotnet_home/shared/$rtf/$rtfv/$rtf.deps.json
+    cp $rtfdeps $apppath/deps
+done
 msg "running pack build"
 run pack build $app --path $apppath --buildpack $packdir
 msg "running pack sbom"
