@@ -5,8 +5,8 @@ set -eo pipefail
 
 source $(dirname $0)/../etc/profile.sh
 
-usage() {
-    cat << EOL
+usage () {
+  cat << EOL
 `bold USAGE`
     `code $prog` -a `under app`
     `code $prog` -l
@@ -37,48 +37,48 @@ app=
 do_list=false
 
 while getopts ":a:lh" opt ; do
-    case $opt in
-        h)
-            usage
-            exit
-            ;;
-        a)
-            app=$OPTARG
-            ;;
-        l)
-            do_list=true
-            ;;
-        \?)
-            die "invalid option -$OPTARG; run with -h for help"
-            ;;
-        :)
-            die "option -$OPTARG requires an argument; run with -h for help" 2>&1
-            ;;
-    esac
+  case $opt in
+    h)
+      usage
+      exit
+      ;;
+    a)
+      app=$OPTARG
+      ;;
+    l)
+      do_list=true
+      ;;
+    \?)
+      die "invalid option -$OPTARG; run with -h for help"
+      ;;
+    :)
+      die "option -$OPTARG requires an argument; run with -h for help" 2>&1
+      ;;
+  esac
 done
 shift $(($OPTIND-1))
 
 if [[ $# > 0 ]]; then
-    die "too many args; run with -h for help"
+  die "too many args; run with -h for help"
 fi
 
 if [[ -z $app ]] && ! $do_list; then
-    die "app not specified; run with -h for help"
+  die "app not specified; run with -h for help"
 fi
 
 if [[ -n $app ]] && $do_list; then
-    die "cannot specify both an app and list; run with -h for help"
+  die "cannot specify both an app and list; run with -h for help"
 fi
 
 if $do_list; then
-    ls -1 $appdir
-    exit
+  ls -1 $appdir
+  exit
 fi
 
 apppath=$appdir/$app
 [[ -d $apppath ]] || die "app not found: $app"
 
-run() {
+run () {
   crumb \$ $*
   $*
 }
@@ -95,10 +95,10 @@ dotnet_home=$(dirname $(command -v dotnet))
 rtconfig=$apppath/bin/Release/*/$app.runtimeconfig.json
 rtfs=$(jq '.runtimeOptions.frameworks[].name' < $rtconfig | tr -d '"')
 for rtf in $rtfs; do
-    rtfv=$(jq '.runtimeOptions.frameworks[] | select(.name=="'$rtf'") | .version' < $rtconfig | tr -d '"')
-    crumb "storing deps for $rtf $rtfv"
-    rtfdeps=$dotnet_home/shared/$rtf/$rtfv/$rtf.deps.json
-    cp $rtfdeps $apppath/deps
+  rtfv=$(jq '.runtimeOptions.frameworks[] | select(.name=="'$rtf'") | .version' < $rtconfig | tr -d '"')
+  crumb "storing deps for $rtf $rtfv"
+  rtfdeps=$dotnet_home/shared/$rtf/$rtfv/$rtf.deps.json
+  cp $rtfdeps $apppath/deps
 done
 msg "running pack build"
 run pack build $app --path $apppath --buildpack $packdir

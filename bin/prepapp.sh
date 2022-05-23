@@ -5,8 +5,8 @@ set -eo pipefail
 
 source $(dirname $0)/../etc/profile.sh
 
-usage() {
-    cat << EOL
+usage () {
+  cat << EOL
 `bold USAGE`
     `code $prog` -s `under template`[:`under framework`[,`under framework`,...]]
     `code $prog` -c `under file`
@@ -48,60 +48,60 @@ spec=
 cfgfile=
 
 while getopts ":c:s:h" opt ; do
-    case $opt in
-        h)
-            usage
-            exit
-            ;;
-        c)
-            cfgfile=$OPTARG
-            ;;
-        s)
-            spec=$OPTARG
-            ;;
-        \?)
-            die "invalid option -$OPTARG; run with -h for help"
-            ;;
-        :)
-            die "option -$OPTARG requires an argument; run with -h for help" 2>&1
-            ;;
-    esac
+  case $opt in
+    h)
+      usage
+      exit
+      ;;
+    c)
+      cfgfile=$OPTARG
+      ;;
+    s)
+      spec=$OPTARG
+      ;;
+    \?)
+      die "invalid option -$OPTARG; run with -h for help"
+      ;;
+    :)
+      die "option -$OPTARG requires an argument; run with -h for help" 2>&1
+      ;;
+  esac
 done
 shift $(($OPTIND-1))
 
 if [[ $# > 0 ]]; then
-    die "too many args; run with -h for help"
+  die "too many args; run with -h for help"
 fi
 
 if [[ -z $spec ]] && [[ -z $cfgfile ]]; then
-    die "specify either a spec or a config file; run with -h for help"
+  die "specify either a spec or a config file; run with -h for help"
 fi
 
 if [[ -n $spec ]] && [[ -n $cfgfile ]]; then
-    die "cannot specify both a spec and a config file; run with -h for help"
+  die "cannot specify both a spec and a config file; run with -h for help"
 fi
 
 if [[ -n $spec ]]; then
-    specs=$spec
+  specs=$spec
 fi
 
 if [[ -n $cfgfile ]]; then
-    specs=$(cat $cfgfile)
+  specs=$(cat $cfgfile)
 fi
 
 for spec in ${specs[@]}; do
-    if [[ $spec =~ .*: ]]; then
-        template=${spec%:*}
-        frameworks=$(echo ${spec#*:} | tr ',' ' ')
-    else
-        template=$spec
-        frameworks=net6.0
-    fi
-    for framework in $frameworks; do
-        app="$template-$(echo $framework | tr -d '.')"
-        output=$appdir/$app
-        msg "creating $app"
-        rm -rf $output
-        dotnet new $template --no-restore --output $output --framework $framework
-    done
+  if [[ $spec =~ .*: ]]; then
+    template=${spec%:*}
+    frameworks=$(echo ${spec#*:} | tr ',' ' ')
+  else
+    template=$spec
+    frameworks=net6.0
+  fi
+  for framework in $frameworks; do
+    app="$template-$(echo $framework | tr -d '.')"
+    output=$appdir/$app
+    msg "creating $app"
+    rm -rf $output
+    dotnet new $template --no-restore --output $output --framework $framework
+  done
 done

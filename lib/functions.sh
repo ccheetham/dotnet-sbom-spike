@@ -23,18 +23,18 @@ crumb () {
   $cli_reset
 }
 
-bold() {
+bold () {
   tput bold
-    printf "%s" "$*"
-    tput sgr0
+  printf "%s" "$*"
+  tput sgr0
 }
 
-under() {
-      tput smul
-    printf "%s" "$*"
-    tput rmul
+under () {
+  tput smul
+  printf "%s" "$*"
+  tput rmul
 }
 
-code() {
+code () {
   bold $*
 }
