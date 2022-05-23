@@ -103,8 +103,6 @@ done
 msg "running pack build"
 run pack build $app --path $apppath --buildpack $packdir
 msg "running pack sbom"
-run pack sbom download $app --output-dir $sbomdir
-cat << EOL
-try running:
-    jq . < $(basename $sbomdir)/layers/sbom/launch/spike_dotnet-sbom/$app/sbom.cdx.json
-EOL
+rm -rf  $sbomdir/$app
+run pack sbom download $app --output-dir $sbomdir/$app
+msg "SBOMs download to $sbomdir/$app"

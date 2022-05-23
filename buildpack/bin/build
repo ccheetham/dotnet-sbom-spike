@@ -69,7 +69,7 @@ log "framework is $framework"
 heading "Generating Project SBOM"
 
 for dep_file in deps/*; do
-    dep_name=$(basename $(basename deps/$dep_file) .deps.json)
+    dep_name=$(basename $(basename deps/$dep_file) .deps.json | tr '.' '_' | tr '[[:upper:]]' '[[:lower:]]')
     log "generating SBOM for $dep_name"
     dep_layer="$layers_dir/$dep_name"
     mkdir -p "$dep_layer"
@@ -77,8 +77,8 @@ for dep_file in deps/*; do
 [types]
 launch = true
 EOL
-    sbom="${layers_dir}/$dep_name.sbom.cdx.json"
-    syft packages "$dep_file" --output cyclonedx-json --file "$sbom"
+    syft packages "$dep_file" --output cyclonedx-json --file "${layers_dir}/$dep_name.sbom.cdx.json"
+    syft packages "$dep_file" --output syft-json --file "${layers_dir}/$dep_name.sbom.syft.json"
 done
 
 # vim: ft=bash sw=4
