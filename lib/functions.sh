@@ -8,6 +8,11 @@ die () {
   exit 1
 }
 
+run () {
+  crumb \$ $*
+  $*
+}
+
 msg () {
   $cli_green
   echo $*

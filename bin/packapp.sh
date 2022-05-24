@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[[ -n $TRACE ]] && set -x
+#set -x
 set -eo pipefail
 
 source $(dirname $0)/../etc/profile.sh
@@ -77,11 +77,6 @@ fi
 
 apppath=$appdir/$app
 [[ -d $apppath ]] || die "app not found: $app"
-
-run () {
-  crumb \$ $*
-  $*
-}
 
 msg "running dotnet restore"
 run dotnet restore $apppath
