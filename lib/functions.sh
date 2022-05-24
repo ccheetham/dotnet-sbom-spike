@@ -3,14 +3,14 @@ cli_green="tput setaf 2"
 cli_yellow="tput setaf 3"
 cli_reset="tput sgr0"
 
-die () {
-  err $*
-  exit 1
-}
-
 run () {
   crumb \$ $*
   $*
+}
+
+die () {
+  err $*
+  exit 1
 }
 
 msg () {
