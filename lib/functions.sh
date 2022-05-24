@@ -4,7 +4,7 @@ cli_yellow="tput setaf 3"
 cli_reset="tput sgr0"
 
 die () {
-  red $*
+  err $*
   exit 1
 }
 
@@ -19,7 +19,7 @@ msg () {
   $cli_reset
 }
 
-red () {
+err () {
   $cli_red
   echo $*
   $cli_reset
