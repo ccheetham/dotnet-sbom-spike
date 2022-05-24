@@ -85,12 +85,16 @@ run () {
 
 msg "running dotnet restore"
 run dotnet restore $apppath
+
 msg "running dotnet build"
 run dotnet build --no-restore --configuration Release $apppath
+
 msg "storing app deps"
 mkdir -p $apppath/deps
 cp $apppath/bin/Release/*/$app.deps.json $apppath/deps
-msg "storeing framework deps"
+
+msg "storing framework deps"
+# https://github.com/dotnet/runtime/blob/main/docs/design/features/sharedfx-lookup.md
 dotnet_home=$(dirname $(command -v dotnet))
 rtconfig=$apppath/bin/Release/*/$app.runtimeconfig.json
 rtfs=$(jq '.runtimeOptions.frameworks[].name' < $rtconfig | tr -d '"')
@@ -100,9 +104,10 @@ for rtf in $rtfs; do
   rtfdeps=$dotnet_home/shared/$rtf/$rtfv/$rtf.deps.json
   cp $rtfdeps $apppath/deps
 done
+
 msg "running pack build"
 run pack build $app --path $apppath --buildpack $packdir
-msg "running pack sbom"
+
+msg "downloading SBOMs to $sbomdir/$app"
 rm -rf  $sbomdir/$app
 run pack sbom download $app --output-dir $sbomdir/$app
-msg "SBOMs download to $sbomdir/$app"
