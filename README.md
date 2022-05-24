@@ -1,6 +1,6 @@
 # .NET SBOM Spike
 
-This spike creates a buildpack to generate NuGet and .NET runtime/framework SBOMS.
+This spike creates a buildpack to generate NuGet and .NET runtime SBOMs.
 
 Status:
 
@@ -32,7 +32,7 @@ to build and pack an app, specify the app name:
 $ bin/packapp.sh -a webapi-net60
 ```
 
-after running, SBOMs downloaded to `sboms` directory:
+after running, SBOMs are downloaded to the `sboms` directory:
 ```
 $ tree sboms/webapi-net60
 sboms/webapi-net60
@@ -59,7 +59,7 @@ sboms/webapi-net60
 * runs `dotnet build`
 * runs `dotnet publish`
 * stores deps files in the app project's `deps` dir (more details to follow)
-* runs the local syft buildpack (more detailed to follow)
+* runs the spike's local syft buildpack (more detailed to follow)
 * downloads the image SBOMs to the `sboms/APPNAME` dir
 
 The local syft buildpack simply iterates over the files in the `deps` dir, creating a layer and SBOMs for each.
