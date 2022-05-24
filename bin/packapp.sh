@@ -82,11 +82,14 @@ msg "running dotnet restore"
 run dotnet restore $apppath
 
 msg "running dotnet build"
-run dotnet build --no-restore --configuration Release $apppath
+run dotnet build --no-restore $apppath
+
+msg "running dotnet publish"
+run dotnet publish --no-build --configuration Release $apppath
 
 msg "storing app deps"
 mkdir -p $apppath/deps
-cp $apppath/bin/Release/*/$app.deps.json $apppath/deps
+cp $apppath/bin/Release/*/publish/$app.deps.json $apppath/deps
 
 if grep netcoreapp3.1 $apppath/*proj >/dev/null; then
   crumb "netcoreapp3.1 framework detected"
@@ -99,7 +102,7 @@ fi
 msg "storing framework deps"
 # https://github.com/dotnet/runtime/blob/main/docs/design/features/sharedfx-lookup.md
 dotnet_home=$(dirname $(command -v dotnet))
-rtconfig=$apppath/bin/Release/*/$app.runtimeconfig.json
+rtconfig=$apppath/bin/Release/*/publish/$app.runtimeconfig.json
 if $is_netcoreapp; then
   rtfs=$(jq '.runtimeOptions.framework.name' < $rtconfig | tr -d '"')
 else
