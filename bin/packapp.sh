@@ -88,13 +88,30 @@ msg "storing app deps"
 mkdir -p $apppath/deps
 cp $apppath/bin/Release/*/$app.deps.json $apppath/deps
 
+if grep netcoreapp3.1 $apppath/*proj >/dev/null; then
+  crumb "netcoreapp3.1 framework detected"
+  is_netcoreapp=true
+else
+  crumb "netcoreapp3.1 framework not detected"
+  is_netcoreapp=false
+fi
+
 msg "storing framework deps"
 # https://github.com/dotnet/runtime/blob/main/docs/design/features/sharedfx-lookup.md
 dotnet_home=$(dirname $(command -v dotnet))
 rtconfig=$apppath/bin/Release/*/$app.runtimeconfig.json
-rtfs=$(jq '.runtimeOptions.frameworks[].name' < $rtconfig | tr -d '"')
+if $is_netcoreapp; then
+  rtfs=$(jq '.runtimeOptions.framework.name' < $rtconfig | tr -d '"')
+else
+  rtfs=$(jq '.runtimeOptions.frameworks[].name' < $rtconfig | tr -d '"')
+fi
 for rtf in $rtfs; do
-  rtfv=$(jq '.runtimeOptions.frameworks[] | select(.name=="'$rtf'") | .version' < $rtconfig | tr -d '"')
+  if $is_netcoreapp; then
+    rtfv=$(jq '.runtimeOptions.framework | select(.name=="'$rtf'") | .version' < $rtconfig | tr -d '"')
+    rtfv=${rtfv%.*}.*
+  else
+    rtfv=$(jq '.runtimeOptions.frameworks[] | select(.name=="'$rtf'") | .version' < $rtconfig | tr -d '"')
+  fi
   crumb "storing deps for $rtf $rtfv"
   rtfdeps=$dotnet_home/shared/$rtf/$rtfv/$rtf.deps.json
   cp $rtfdeps $apppath/deps
