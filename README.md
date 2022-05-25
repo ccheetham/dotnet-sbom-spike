@@ -9,7 +9,7 @@ to see a list of available apps, run:
 $ bin/sbom.sh -l
 ```
 
-to see Syft SBOM output for an app, run:
+to see Syft package output for an app, run:
 ```
 $ bin/sbom.sh -a webapi-net60
 ```
