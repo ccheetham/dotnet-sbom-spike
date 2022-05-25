@@ -101,7 +101,7 @@ runtimes=$(cat $runtime_cfg | jq '.runtimeOptions.includedFrameworks[]?.name' | 
 echo 'runtimes are >'$runtimes'<'
 [[ -z $runtimes ]] && runtimes=$(cat $runtime_cfg | jq '.runtimeOptions.frameworks[]?.name' | tr -d '"')
 for runtime in $runtimes; do
-  runtime_version=$(cat $runtime_cfg | jq '.runtimeOptions.includedFrameworks[] | select(.name=="'$runtime'") | .version' | tr -d '"')
+  runtime_version=$(cat $runtime_cfg | jq '.runtimeOptions.includedFrameworks[]? | select(.name=="'$runtime'") | .version' | tr -d '"')
   [[ -z $runtime_version ]] && runtime_version=$(cat $runtime_cfg | jq '.runtimeOptions.frameworks[] | select(.name=="'$runtime'") | .version' | tr -d '"')
   msg "running syft on runtime $runtime:$runtime_version"
   runtime_deps=$dotnet_home/shared/$runtime/$runtime_version/$runtime.deps.json
