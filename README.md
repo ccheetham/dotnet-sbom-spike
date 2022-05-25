@@ -1,6 +1,6 @@
 # .NET SBOM Spike
 
-This spike looks at Syft's capabilities _vis-a-vis_ dotnet.
+This spike looks at Syft's capabilities _vis-a-vis_ .NET.
 
 ## Overview
 
@@ -14,4 +14,4 @@ to see Syft SBOM output for an app, run:
 $ bin/sbom.sh -a webapi-net60
 ```
 
-For more details on how dotnet deps can be derived, see https://github.com/dotnet/runtime/blob/main/docs/design/features/sharedfx-lookup.md
+For more details on how .NET deps can be derived, see https://github.com/dotnet/runtime/blob/main/docs/design/features/sharedfx-lookup.md
