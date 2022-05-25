@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#set -x
+# set -x
 set -eo pipefail
 
 source $(dirname $0)/../etc/profile.sh
@@ -15,7 +15,7 @@ usage () {
     Run `code syft` in various ways on an app to list possible SBOM contents.
     Apps are located in the `code $(basename $apps_home)` dir; run with `code -l` for a listing.
 
-    Before running `code syft`, `code dotnet publish -output publish` is run.
+    Before running `code syft`, `code dotnet publish` is run.
     Additional arguments to `code publish` can be specified in the file `code spike/publish` in the app project dir.
 
     The `code syft` command is found on your PATH.
@@ -84,21 +84,26 @@ app_dir=$apps_home/$app
 msg "running dotnet publish"
 publish_args=
 [[ -f $app_dir/spike/publish ]] && publish_args=$(cat $app_dir/spike/publish)
-eval run dotnet publish $app_dir $publish_args
 
-(
-  cd $app_dir
-  msg "running syft on publish dir"
-  run syft packages publish
-  msg "running syft on app deps file"
-  run syft packages publish/$app.deps.json
-  dotnet_home=$(dirname $(command -v dotnet))
-  runtime_cfg=publish/$app.runtimeconfig.json
-  runtimes=$(cat $runtime_cfg | jq '.runtimeOptions.frameworks[].name' | tr -d '"')
-  for runtime in $runtimes; do
-    runtime_version=$(cat $runtime_cfg | jq '.runtimeOptions.frameworks[] | select(.name=="'$runtime'") | .version' | tr -d '"')
-    msg "running syft on runtime $runtime:$runtime_version"
-    runtime_deps=$dotnet_home/shared/$runtime/$runtime_version/$runtime.deps.json
-    run syft packages $runtime_deps
-  done
-)
+cd $app_dir
+pwd
+msg "cleaning"
+find . -type d -name bin -o -name obj | xargs rm -r
+eval run dotnet publish $app_dir $publish_args
+publish_dir=$(find . -type d -name publish)
+msg "running syft on publish dir"
+run syft packages $publish_dir
+msg "running syft on app deps file"
+run syft packages $publish_dir/$app.deps.json
+dotnet_home=$(dirname $(command -v dotnet))
+runtime_cfg=$publish_dir/$app.runtimeconfig.json
+runtimes=$(cat $runtime_cfg | jq '.runtimeOptions.includedFrameworks[]?.name' | tr -d '"')
+echo 'runtimes are >'$runtimes'<'
+[[ -z $runtimes ]] && runtimes=$(cat $runtime_cfg | jq '.runtimeOptions.frameworks[]?.name' | tr -d '"')
+for runtime in $runtimes; do
+  runtime_version=$(cat $runtime_cfg | jq '.runtimeOptions.includedFrameworks[] | select(.name=="'$runtime'") | .version' | tr -d '"')
+  [[ -z $runtime_version ]] && runtime_version=$(cat $runtime_cfg | jq '.runtimeOptions.frameworks[] | select(.name=="'$runtime'") | .version' | tr -d '"')
+  msg "running syft on runtime $runtime:$runtime_version"
+  runtime_deps=$dotnet_home/shared/$runtime/$runtime_version/$runtime.deps.json
+  run syft packages $runtime_deps
+done
